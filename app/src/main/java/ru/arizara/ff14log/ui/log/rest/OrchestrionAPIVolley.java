@@ -16,6 +16,7 @@ import com.android.volley.toolbox.Volley;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import ru.arizara.ff14log.ui.log.entities.MyResponse;
@@ -31,6 +32,7 @@ public class OrchestrionAPIVolley implements OrchestrionAPI{
 
     String url = BASE_URL + "/orchestrion";
 
+
     public OrchestrionAPIVolley(Context context) {
         this.context = context;
     }
@@ -38,7 +40,6 @@ public class OrchestrionAPIVolley implements OrchestrionAPI{
     @Override
     public void getAllOrchestrion(MutableLiveData<List<Orchestrion>> list) {
         RequestQueue requestQueue = Volley.newRequestQueue(context);
-
         JsonArrayRequest request = new JsonArrayRequest(
                 Request.Method.GET,
                 url,

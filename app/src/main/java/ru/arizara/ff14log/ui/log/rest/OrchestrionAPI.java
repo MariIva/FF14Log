@@ -9,5 +9,5 @@ import ru.arizara.ff14log.ui.log.entities.Orchestrion;
 public interface OrchestrionAPI {
 
      void getAllOrchestrion(MutableLiveData<List<Orchestrion>> list);
-
+//     public List<Orchestrion> getAllOrchestrion();
 }
