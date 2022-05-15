@@ -2,9 +2,11 @@ package ru.arizara.ff14log.ui.log.fragments;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
+import android.content.DialogInterface;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -21,7 +23,7 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageButton;
 
-import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputLayout;
 
 import java.util.ArrayList;
@@ -41,9 +43,10 @@ public class OrchestrionsListFragment extends Fragment {
 
     private OrchestrionsListFragmentBinding binding;
     private OrchestrionsListViewModel mViewModel;
-    private LiveData<List<Orchestrion>> liveData;
 
     private List<Orchestrion> orchestrionList;
+    private String[] patches;
+    private boolean[] checkedPatches;
 
     private RecyclerView recyclerView;
     private OrchestrionsAdapter adapter;
@@ -75,8 +78,7 @@ public class OrchestrionsListFragment extends Fragment {
 
         initRecyclerView();
 
-        liveData =  mViewModel.getData();
-        liveData.observe(getViewLifecycleOwner(), new Observer<List<Orchestrion>>() {
+        mViewModel.getDataList().observe(getViewLifecycleOwner(), new Observer<List<Orchestrion>>() {
             @Override
             public void onChanged(@Nullable List<Orchestrion> list) {
                 orchestrionList.clear();
@@ -84,11 +86,52 @@ public class OrchestrionsListFragment extends Fragment {
                 adapter.notifyDataSetChanged();
             }
         });
+        mViewModel.getDataPatches().observe(getViewLifecycleOwner(), new Observer<String[]>() {
+            @Override
+            public void onChanged(@Nullable String[] list) {
+                patches = list;
+            }
+        });
+        mViewModel.getDataCheckedPatches().observe(getViewLifecycleOwner(), new Observer<boolean[]>() {
+            @Override
+            public void onChanged(@Nullable boolean[] list) {
+                checkedPatches = list;
+            }
+        });
+
+
 
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                new MaterialAlertDialogBuilder(getContext())
+                        .setTitle("Choose patches")
+                        .setMultiChoiceItems(patches,checkedPatches,
+                                new DialogInterface.OnMultiChoiceClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which, boolean isChecked) {
+                                mViewModel.checkPatches(which,isChecked);
+                            }
+                        })
+                        .setPositiveButton(getResources().getString(R.string.accept), new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                List<String> patchNum = new ArrayList<>();
+                                for (int i1 = 0; i1 < checkedPatches.length; i1++) {
+                                    if(checkedPatches[i1]){
+                                        patchNum.add(checkedPatches.length-i1+1+".");
+                                    }
+                                }
+                                mViewModel.searchItemByPatch(patchNum);
+                            }
+                        })
+                        .setNegativeButton(getResources().getString(R.string.decline), new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
 
+                            }
+                        })
+                        .show();
             }
         });
 
@@ -98,7 +141,7 @@ public class OrchestrionsListFragment extends Fragment {
             }
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                mViewModel.searchItem(s.toString());
+                mViewModel.searchItemByName(s.toString());
                 adapter.notifyDataSetChanged();
             }
             @Override
