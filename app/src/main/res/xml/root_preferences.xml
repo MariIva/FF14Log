@@ -1,0 +1,46 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <PreferenceCategory app:title="@string/messages_header">
+        <SwitchPreferenceCompat
+            android:id="@+id/sw_orch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:key="orch"
+            app:title="@string/orchestrions" />
+    </PreferenceCategory>
+
+    <PreferenceCategory app:title="@string/sync_header">
+
+        <SwitchPreferenceCompat
+            android:id="@+id/sw_endwalker"
+            app:key="endwalker"
+            app:title="@string/endwalker"/>
+        <SwitchPreferenceCompat
+            android:id="@+id/sw_shadowbringers"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:key="shadowbringers"
+            app:title="@string/shadowbringers" />
+        <SwitchPreferenceCompat
+            android:id="@+id/sw_stormblood"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:key="stormblood"
+            app:title="@string/stormblood" />
+        <SwitchPreferenceCompat
+            android:id="@+id/sw_heavensward"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:key="heavensward"
+            app:title="@string/heavensward" />
+        <SwitchPreferenceCompat
+            android:id="@+id/sw_reborn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:key="reborn"
+            app:title="@string/reborn" />
+
+    </PreferenceCategory>
+
+</PreferenceScreen>
