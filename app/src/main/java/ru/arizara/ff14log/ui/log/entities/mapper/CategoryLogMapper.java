@@ -6,7 +6,14 @@ import org.json.JSONObject;
 import ru.arizara.ff14log.ui.log.entities.Orchestrion;
 import ru.arizara.ff14log.ui.log.entities.subEntities.CategoryLog;
 
+/**
+ * Парсер JSON объетов категорий, полученных от сервера
+ */
 public class CategoryLogMapper {
+
+    /**
+     *
+     */
     public static CategoryLog CategoryLogFromJSON(JSONObject jsonObject) {
 
         CategoryLog log = null;
@@ -22,4 +29,5 @@ public class CategoryLogMapper {
 
         return log;
     }
+
 }

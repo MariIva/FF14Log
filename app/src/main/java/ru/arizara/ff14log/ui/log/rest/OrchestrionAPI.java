@@ -6,8 +6,14 @@ import java.util.List;
 
 import ru.arizara.ff14log.ui.log.entities.Orchestrion;
 
+/**
+ * Список запросов к серверу
+ */
 public interface OrchestrionAPI {
 
      void getAllOrchestrion(MutableLiveData<List<Orchestrion>> list);
-//     public List<Orchestrion> getAllOrchestrion();
+     void getAllOrchestrion(List<Orchestrion> list);
+
+     void getOrchestrionByPatch(MutableLiveData<List<Orchestrion>> list);
+
 }

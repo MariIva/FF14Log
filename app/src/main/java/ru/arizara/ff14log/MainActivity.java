@@ -2,17 +2,16 @@ package ru.arizara.ff14log;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.view.MenuItem;
-import android.view.View;
-import android.view.Menu;
+import android.util.Log;
 
-import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.navigation.NavigationView;
 
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
+import androidx.navigation.NavDestination;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
@@ -22,46 +21,51 @@ import androidx.appcompat.app.AppCompatActivity;
 import java.util.ArrayList;
 import java.util.List;
 
+import ru.arizara.ff14log.DB.LogsDB;
 import ru.arizara.ff14log.databinding.ActivityMainBinding;
-import ru.arizara.ff14log.ui.log.fragments.LogFragment;
+import ru.arizara.ff14log.ui.log.entities.LogList;
+import ru.arizara.ff14log.ui.log.entities.Orchestrion;
+import ru.arizara.ff14log.ui.log.entities.Patch;
 import ru.arizara.ff14log.ui.log.viewModel.LogViewModel;
 
-public class MainActivity extends AppCompatActivity
-        /*implements NavigationView.OnNavigationItemSelectedListener*/{
+public class MainActivity extends AppCompatActivity{
 
     private AppBarConfiguration mAppBarConfiguration;
     private ActivityMainBinding binding;
 
-    private LogViewModel logLiveData;
+    private SharedPreferences prefs = null;
+    private boolean settingFlag = false;
 
-    SharedPreferences prefs = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-       /* List<String> list = new ArrayList<>();
-        list.add(getString(R.string.orchestrions));*/
-
-        //logLiveData = new LogViewModel(getApplication());
-
+        new LogsDB(this);
 
 
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        setSupportActionBar(binding.appBarMain.toolbar);
-       /* binding.appBarMain.fab.setOnClickListener(new View.OnClickListener() {
+        prefs = androidx.preference.PreferenceManager.getDefaultSharedPreferences(this);
+
+        new Thread(new Runnable() {
             @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+            public void run() {
+
+                /*LiveData<List<LogList>> p = LogsDB.getAllLogs();
+                List<LogList> d = p.getValue();*/
+                //List<Orchestrion> p = LogsDB.getAllOrchestrion();
+                //LogsDB.addLogs(new LogList(getResources().getString(R.string.orchestrions),0,0));
+                //patches = LogsDB.getAllLogsg();
+                //patches = LogsDB.getAllLogsg();
             }
-        });*/
+        }).start();
+
+
+        setSupportActionBar(binding.appBarMain.toolbar);
         DrawerLayout drawer = binding.drawerLayout;
         NavigationView navigationView = binding.navView;
-        // Passing each menu ID as a set of Ids because each
-        // menu should be considered as top level destinations.
         mAppBarConfiguration = new AppBarConfiguration.Builder(
                 R.id.nav_log, R.id.nav_setting)
                 .setDrawerLayout(drawer)
@@ -69,27 +73,67 @@ public class MainActivity extends AppCompatActivity
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
         NavigationUI.setupWithNavController(navigationView, navController);
+        // движение фрагментов (закрытие настроек)
+        navController.addOnDestinationChangedListener(new NavController.OnDestinationChangedListener() {
+            @Override
+            public void onDestinationChanged(@NonNull NavController controller, @NonNull NavDestination destination, @Nullable Bundle arguments) {
+                Log.e("onDestinationChanged",destination.getLabel().toString() );
+                switch (destination.getLabel().toString()){
+                    case "Setting":
+                        settingFlag = true;
+                        break;
+                    case "Logs":
+                        if(settingFlag){
+                            settingFlag = false;
 
-        prefs = androidx.preference.PreferenceManager.getDefaultSharedPreferences(this);
+/*
+                            List<Patch> patches = new ArrayList<>();
+                            patches.add(new Patch(6, getResources().getString(R.string.endwalker), prefs.getBoolean("endwalker", false)));
+                            patches.add(new Patch(5, getResources().getString(R.string.shadowbringers), prefs.getBoolean("shadowbringers", false)));
+                            patches.add(new Patch(4, getResources().getString(R.string.stormblood), prefs.getBoolean("stormblood", false)));
+                            patches.add(new Patch(3, getResources().getString(R.string.heavensward), prefs.getBoolean("heavensward", false)));
+                            patches.add(new Patch(2, getResources().getString(R.string.reborn), prefs.getBoolean("reborn", false)));
+*/
+                            // включение логов
+                            List<LogList> logLists = new ArrayList<>();
+                            if (prefs.getBoolean("orch", false)) {
+                                logLists.add(new LogList(getResources().getString(R.string.orchestrions),0,0));
+                            }
+                            //обновление БД
+                            LogsDB.loadData(getApplication(), logLists);
+
+                            /*new Thread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    LogsDB.addLogs(new LogList(getResources().getString(R.string.orchestrions),0,0));
+
+                                }
+                            }).start();*/
+                        }
+                        break;
+                }
+
+            }
+        });
 
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-
+        // при первом запуске заполняется таблица патчей
         if (prefs.getBoolean("firstrun", true)) {
             prefs.edit().putBoolean("firstrun", false).apply();
             //todo создание БД
+            List<Patch> patches = new ArrayList<>();
+            patches.add(new Patch(6, getResources().getString(R.string.endwalker), false));
+            patches.add(new Patch(5, getResources().getString(R.string.shadowbringers), false));
+            patches.add(new Patch(4, getResources().getString(R.string.stormblood), false));
+            patches.add(new Patch(3, getResources().getString(R.string.heavensward), false));
+            patches.add(new Patch(2, getResources().getString(R.string.reborn), false));
+            LogsDB.addPatch(patches);
         }
     }
-
-   /* @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.main, menu);
-        return true;
-    }*/
 
     @Override
     public boolean onSupportNavigateUp() {

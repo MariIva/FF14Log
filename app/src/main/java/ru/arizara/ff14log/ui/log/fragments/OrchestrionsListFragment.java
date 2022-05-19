@@ -36,9 +36,13 @@ import ru.arizara.ff14log.databinding.OrchestrionsListFragmentBinding;
 //import ru.arizara.ff14log.ui.log.LogList;
 //import ru.arizara.ff14log.ui.log.viewModel.LogViewModel;
 import ru.arizara.ff14log.ui.log.adapters.OrchestrionsAdapter;
+import ru.arizara.ff14log.ui.log.entities.Patch;
 import ru.arizara.ff14log.ui.log.viewModel.OrchestrionsListViewModel;
 import ru.arizara.ff14log.ui.log.entities.Orchestrion;
 
+/**
+ * Фрагмент для списка мелодий
+ */
 public class OrchestrionsListFragment extends Fragment {
 
     private OrchestrionsListFragmentBinding binding;
@@ -81,15 +85,22 @@ public class OrchestrionsListFragment extends Fragment {
         mViewModel.getDataList().observe(getViewLifecycleOwner(), new Observer<List<Orchestrion>>() {
             @Override
             public void onChanged(@Nullable List<Orchestrion> list) {
-                orchestrionList.clear();
-                orchestrionList.addAll(list);
-                adapter.notifyDataSetChanged();
+                adapter.addOrchestrion(list);
             }
         });
-        mViewModel.getDataPatches().observe(getViewLifecycleOwner(), new Observer<String[]>() {
+
+        mViewModel.getDataListOr().observe(getViewLifecycleOwner(), new Observer<List<Orchestrion>>() {
             @Override
-            public void onChanged(@Nullable String[] list) {
-                patches = list;
+            public void onChanged(@Nullable List<Orchestrion> list) {
+            }
+        });
+        mViewModel.getDataPatches().observe(getViewLifecycleOwner(), new Observer<List<Patch>>() {
+            @Override
+            public void onChanged(List<Patch> list) {
+                patches = new String[list.size()];
+                for (int i = 0; i < list.size(); i++) {
+                    patches[list.size()-i-1] = list.get(i).getName();
+                }
             }
         });
         mViewModel.getDataCheckedPatches().observe(getViewLifecycleOwner(), new Observer<boolean[]>() {
@@ -163,12 +174,4 @@ public class OrchestrionsListFragment extends Fragment {
     }
 
 
-/*
-    @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        mViewModel = new ViewModelProvider(this).get(OrchestrionsListViewModel.class);
-        // TODO: Use the ViewModel
-    }
-*/
 }

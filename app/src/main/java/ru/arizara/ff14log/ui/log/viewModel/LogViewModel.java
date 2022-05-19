@@ -2,6 +2,8 @@ package ru.arizara.ff14log.ui.log.viewModel;
 
 import android.app.Application;
 import android.content.Context;
+import android.os.Handler;
+import android.os.Message;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
@@ -11,43 +13,34 @@ import androidx.lifecycle.ViewModel;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
+import ru.arizara.ff14log.DB.LogsDB;
 import ru.arizara.ff14log.R;
-import ru.arizara.ff14log.ui.log.LogList;
+import ru.arizara.ff14log.repository.LogsRepo;
+import ru.arizara.ff14log.ui.log.entities.LogList;
+
+import androidx.lifecycle.Observer;
 
 public class LogViewModel extends AndroidViewModel {
 
+    private LogsRepo repo;
 
-    private  MutableLiveData<List<LogList>> rvLogs;
+    private LiveData<List<LogList>> rvLogs;
 
     public LogViewModel(@NonNull Application application) {
         super(application);
+        repo = new LogsRepo(application);
+        rvLogs = repo.getAll();
     }
 
-
-    /* private LogLiveData(Context context) {
-         rvLogs = new MutableLiveData<>();
-         List<LogList> list = new ArrayList<>();
-         list.add(new LogList(context.getString(R.string.orchestrions)));
-
-         rvLogs.setValue(list);
-     }
-
-     public LiveData<List<LogList>> getList() {
-         return rvLogs;
-     }*/
-   public LiveData<List<LogList>> getData() {
-       if (rvLogs == null) {
-           rvLogs = new MutableLiveData<>();
-           loadData();
-       }
-       return rvLogs;
-   }
-
-    private void loadData() {
-        List<LogList> list = new ArrayList<>();
-        list.add(new LogList((byte) 0, getApplication().getString(R.string.orchestrions)));
-        rvLogs.setValue(list);
+    public LiveData<List<LogList>> getData() {
+        return rvLogs;
     }
+
+    public void insert(LogList logList) { repo.insert(logList); }
+
+
 
 }

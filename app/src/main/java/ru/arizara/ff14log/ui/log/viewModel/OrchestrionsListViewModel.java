@@ -1,9 +1,6 @@
 package ru.arizara.ff14log.ui.log.viewModel;
 
-import android.annotation.SuppressLint;
 import android.app.Application;
-import android.os.Handler;
-import android.os.Message;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -14,18 +11,24 @@ import androidx.lifecycle.MutableLiveData;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
-import ru.arizara.ff14log.R;
+import ru.arizara.ff14log.DB.LogsDB;
+import ru.arizara.ff14log.repository.OrchestrionRepo;
+import ru.arizara.ff14log.repository.PatchRepo;
 import ru.arizara.ff14log.ui.log.entities.Orchestrion;
-import ru.arizara.ff14log.ui.log.rest.OrchestrionAPIVolley;
+import ru.arizara.ff14log.ui.log.entities.Patch;
 
 public class OrchestrionsListViewModel extends AndroidViewModel {
 
+    private OrchestrionRepo repo;
+    private PatchRepo patchRepo;
 
-    private MutableLiveData<List<Orchestrion>> rvOrchestrionOrigin;
+    private LiveData<List<Orchestrion>> rvOrchestrionOrigin;
     private MutableLiveData<List<Orchestrion>> rvOrchestrion;
 
-    private MutableLiveData<String[]> patches;
+    private LiveData<List<Patch>> patches;
     private MutableLiveData<boolean[]> checkedPatches;
 
 
@@ -33,37 +36,70 @@ public class OrchestrionsListViewModel extends AndroidViewModel {
 
     public OrchestrionsListViewModel(@NonNull Application application) {
         super(application);
+        repo = new OrchestrionRepo(application);
+        patchRepo = new PatchRepo(application);
+        rvOrchestrionOrigin = repo.getAll();
+        patches = patchRepo.getAll();
+        loadData();
+        /*List<Orchestrion> list = rvOrchestrionOrigin.getValue();
+        if (list==null){
+            rvOrchestrion.setValue(new ArrayList<>());
+        }
+        else {
+            rvOrchestrion.setValue(new ArrayList<>(list));
+        }*/
     }
 
 
-    Handler handler = new Handler() {   // создание хэндлера
+   /* Handler handler = new Handler() {   // создание хэндлера
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
             rvOrchestrionOrigin.setValue(new ArrayList<>(rvOrchestrion.getValue()));
         }
-    };
+    };*/
 
     public LiveData<List<Orchestrion>> getDataList() {
-        if (rvOrchestrion == null) {
+        /*if (rvOrchestrion == null) {
             rvOrchestrionOrigin = new MutableLiveData<>();
             rvOrchestrion = new MutableLiveData<>();
             loadData();
-        }
+        }*/
         return rvOrchestrion;
     }
 
-    public LiveData<String[]> getDataPatches() {
+    public LiveData<List<Orchestrion>> getDataListOr() {
+        /*if (rvOrchestrion == null) {
+            rvOrchestrionOrigin = new MutableLiveData<>();
+            rvOrchestrion = new MutableLiveData<>();
+            loadData();
+        }*/
+        return rvOrchestrionOrigin;
+    }
+
+    public LiveData<List<Patch>> getDataPatches() {
         // todo get data from base
 
-        patches = new MutableLiveData<>();
-        patches.setValue(new String[]{
+        /*patches = new MutableLiveData<>();
+        *//*patches.setValue(new String[]{
                 "endwalker",
                 "shadowbringers",
                 "stormblood",
                 "heavensward",
                 "reborn"
-        });
+        });*//*
+        ExecutorService service = Executors.newSingleThreadExecutor();
+        service.submit(new Runnable() {
+            @Override
+            public void run() {
+                List<Patch> list = LogsDB.getByCheck();
+                List<String> strings = new ArrayList<>();
+                for (Patch patch : list) {
+                    strings.add(patch.getName());
+                }
+                patches.postValue((String[]) strings.toArray());
+            }
+        });*/
         return patches;
     }
 
@@ -76,7 +112,15 @@ public class OrchestrionsListViewModel extends AndroidViewModel {
 
     private void loadData() {
         //todo get data from base
-        new OrchestrionAPIVolley(
+        rvOrchestrion = new MutableLiveData<>();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                List<Orchestrion> list = LogsDB.getAllOrchestrion();
+                rvOrchestrion.postValue(list);
+            }
+        }).start();
+       /* new OrchestrionAPIVolley(
                 getApplication().getApplicationContext())
                 .getAllOrchestrion(rvOrchestrion);
         new Thread(new Runnable() {
@@ -88,13 +132,13 @@ public class OrchestrionsListViewModel extends AndroidViewModel {
                 } while (list == null);
                 handler.sendEmptyMessage(0);
             }
-        }).start();
+        }).start();*/
     }
 
     public void searchItemByName(String textToSearch) {
         List<Orchestrion> list;
         if (lengNameItem < textToSearch.length()) {
-            list = rvOrchestrion.getValue();
+            list = new ArrayList<>(rvOrchestrion.getValue());
         } else {
             list = new ArrayList<>(rvOrchestrionOrigin.getValue());
         }

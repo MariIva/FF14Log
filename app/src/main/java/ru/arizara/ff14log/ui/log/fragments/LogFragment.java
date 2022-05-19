@@ -16,18 +16,23 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
 import java.util.List;
 
+import ru.arizara.ff14log.DB.LogsDB;
 import ru.arizara.ff14log.R;
 import ru.arizara.ff14log.databinding.FragmentLogBinding;
 import ru.arizara.ff14log.ui.log.adapters.LogAdapter;
-import ru.arizara.ff14log.ui.log.LogList;
+import ru.arizara.ff14log.ui.log.entities.LogList;
 import ru.arizara.ff14log.ui.log.viewModel.LogViewModel;
-
+/**
+ * Фрагмент для списка логов
+ */
 public class LogFragment extends Fragment {
 
     private LogViewModel logViewModel;
     private List<LogList> logLists;
     private FragmentLogBinding binding;
     //private  RecyclerView recyclerView;
+
+    LogAdapter adapter;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -46,24 +51,31 @@ public class LogFragment extends Fragment {
         //logLiveData = LogViewModel.getInstance(getContext());
 
 
-        logViewModel.getData().observe(getViewLifecycleOwner(), new Observer<List<LogList>>() {
-            @Override
-            public void onChanged(@Nullable List<LogList> list) {
-                logLists.clear();
-                logLists.addAll(list);
 
+       /* LogsDB.getAllLogs().observe(getViewLifecycleOwner(), new Observer<List<LogList>>() {
+            @Override
+            public void onChanged(List<LogList> logLists) {
+                logLists.clear();
+                logLists.addAll(logLists);
             }
-        });
+        });*/
+
+
 
         RecyclerView recyclerView = (RecyclerView) root.findViewById(R.id.rv_log);
         // создаем адаптер
         recyclerView.setLayoutManager(new GridLayoutManager(getContext(), 2,
                 GridLayoutManager.VERTICAL, false));
-        LogAdapter adapter = new LogAdapter(getContext(), logLists);
+        adapter = new LogAdapter(getContext(), logLists);
         // устанавливаем для списка адаптер
         recyclerView.setAdapter(adapter);
 
-
+        logViewModel.getData().observe(getViewLifecycleOwner(), new Observer<List<LogList>>() {
+            @Override
+            public void onChanged(@Nullable List<LogList> list) {
+                adapter.addLogs(list);
+            }
+        });
 
 
         return root;

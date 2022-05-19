@@ -9,7 +9,12 @@ import java.util.List;
 
 import ru.arizara.ff14log.ui.log.entities.Orchestrion;
 
+
 public class OrchestrionMapper {
+
+    /**
+     *
+     */
     public static Orchestrion orchestrionFromJSON(JSONObject jsonObject) {
 
         Orchestrion orchestrion = null;
@@ -33,6 +38,9 @@ public class OrchestrionMapper {
         return orchestrion;
     }
 
+    /**
+     *
+     */
     public static List<Orchestrion> orchestrionFromJSONArray(JSONArray array) {
         List<Orchestrion> list = new ArrayList<>();
         for (int i=0; i<array.length(); i++) {

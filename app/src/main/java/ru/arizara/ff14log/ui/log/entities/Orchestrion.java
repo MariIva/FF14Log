@@ -1,28 +1,40 @@
 package ru.arizara.ff14log.ui.log.entities;
 
-
-
 import androidx.room.Entity;
+import androidx.room.ForeignKey;
+import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
-import ru.arizara.ff14log.ui.log.entities.subEntities.CategoryLog;
-import ru.arizara.ff14log.ui.log.entities.subEntities.x_Type;
+import java.util.Objects;
 
-@Entity
+import ru.arizara.ff14log.ui.log.entities.subEntities.CategoryLog;
+/**
+ * Класс логов
+ * Описание таблицы в БД
+ */
+@Entity(foreignKeys = @ForeignKey(entity = CategoryLog.class, parentColumns = "id", childColumns = "categoryID"))
 public class Orchestrion {
+
+	/**Поле первичный ключ*/
 	@PrimaryKey(autoGenerate = false)
 	private int id;
+	/** Название мелодии*/
 	private String name;
+	/** Описание мелодии*/
 	private String description;
+	/** Патч добавления*/
 	private String patch;
-/*	private Integer item_id;
-	private String owned;
-	private String number;
-	private String icon;*/
+	/** Категория мелодии
+	 * Игнорируется БД
+	 */
+	@Ignore
 	private CategoryLog category;
-
+	/** id категории*/
+	private int categoryID;
+	/** Метка, получения мелодии*/
 	private boolean check;
 
+	@Ignore
 	public Orchestrion(int id, String name, String description, String patch,
 					   CategoryLog category, boolean check) {
 		this.id = id;
@@ -33,42 +45,26 @@ public class Orchestrion {
 		this.check = check;
 	}
 
+
+	public Orchestrion(int id, String name, String description, String patch, int categoryID, boolean check) {
+		this.id = id;
+		this.name = name;
+		this.description = description;
+		this.patch = patch;
+		this.categoryID = categoryID;
+		this.check = check;
+	}
+
+	@Ignore
 	public Orchestrion(int id, String name, String description, String patch, CategoryLog category) {
 		this.id = id;
 		this.name = name;
 		this.description = description;
 		this.patch = patch;
 		this.category = category;
+		this.categoryID = category.getId();
 		this.check = false;
 	}
-/*public Orchestrion(int id, String name, String description, String patch, int item_id,
-					   String owned, String number, String icon, CategoryLog category,
-					   boolean check) {
-		this.id = id;
-		this.name = name;
-		this.description = description;
-		this.patch = patch;
-		this.item_id = item_id;
-		this.owned = owned;
-		this.number = number;
-		this.icon = icon;
-		this.category = category;
-		this.check = check;
-	}
-
-	public Orchestrion(int id, String name, String description, String patch, int item_id,
-					   String owned, String number, String icon, CategoryLog category) {
-		this.id = id;
-		this.name = name;
-		this.description = description;
-		this.patch = patch;
-		this.item_id = item_id;
-		this.owned = owned;
-		this.number = number;
-		this.icon = icon;
-		this.category = category;
-		this.check = false;
-	}*/
 	public int getId() {
 		return id;
 	}
@@ -85,23 +81,32 @@ public class Orchestrion {
 		return patch;
 	}
 
-	/*public int getItem_id() {
-		return item_id;
-	}
-
-	public String getOwned() {
-		return owned;
-	}
-
-	public String getNumber() {
-		return number;
-	}
-
-	public String getIcon() {
-		return icon;
-	}*/
-
 	public CategoryLog getCategory() {
 		return category;
+	}
+
+	public int getCategoryID() {
+		return categoryID;
+	}
+
+	public boolean isCheck() {
+		return check;
+	}
+
+	public void setCheck(boolean check) {
+		this.check = check;
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		Orchestrion that = (Orchestrion) o;
+		return id == that.id && name.equals(that.name) && description.equals(that.description) && patch.equals(that.patch);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(id, name, description, patch);
 	}
 }
