@@ -21,7 +21,8 @@ public class CategoryLogMapper {
         try {
             log = new CategoryLog(
                     jsonObject.getInt("id"),
-                    jsonObject.getString("name")
+                    jsonObject.getString("name"),
+                    jsonObject.getString("icon")
             );
         } catch (JSONException e) {
             e.printStackTrace();

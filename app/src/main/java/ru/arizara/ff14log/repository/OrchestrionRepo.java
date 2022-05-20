@@ -13,6 +13,7 @@ import ru.arizara.ff14log.DB.LogsDB;
 import ru.arizara.ff14log.DB.OrchestrionDAO;
 import ru.arizara.ff14log.ui.log.entities.LogList;
 import ru.arizara.ff14log.ui.log.entities.Orchestrion;
+import ru.arizara.ff14log.ui.log.entities.subEntities.OrchestrionWithCategory;
 
 /**
  * Синхронизация таблицы с мелодиями и LiveData (список мелодий)
@@ -22,7 +23,7 @@ public class OrchestrionRepo {
     private OrchestrionDAO orchestrionDAO;
 
     /** Список логов*/
-    private LiveData<List<Orchestrion>> mAll;
+    private LiveData<List<OrchestrionWithCategory>> mAll;
 
     /**
      *
@@ -35,16 +36,14 @@ public class OrchestrionRepo {
     /**
      *
      */
-    public LiveData<List<Orchestrion>> getAll() {
+    public LiveData<List<OrchestrionWithCategory>> getAll() {
         return mAll;
     }
 
-    /**
-     *
-     */
-    public List<Orchestrion> getAllList() {
+
+   /* public List<Orchestrion> getAllList() {
         return orchestrionDAO.getAllList();
-    }
+    }*/
     /**
      *
      */

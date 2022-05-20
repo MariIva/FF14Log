@@ -8,8 +8,6 @@ import com.google.android.material.navigation.NavigationView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.lifecycle.LiveData;
-import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.NavDestination;
 import androidx.navigation.Navigation;
@@ -24,9 +22,8 @@ import java.util.List;
 import ru.arizara.ff14log.DB.LogsDB;
 import ru.arizara.ff14log.databinding.ActivityMainBinding;
 import ru.arizara.ff14log.ui.log.entities.LogList;
-import ru.arizara.ff14log.ui.log.entities.Orchestrion;
 import ru.arizara.ff14log.ui.log.entities.Patch;
-import ru.arizara.ff14log.ui.log.viewModel.LogViewModel;
+import ru.arizara.ff14log.ui.log.rest.ImageAPIVolley;
 
 public class MainActivity extends AppCompatActivity{
 
@@ -52,7 +49,7 @@ public class MainActivity extends AppCompatActivity{
         new Thread(new Runnable() {
             @Override
             public void run() {
-
+                //new ImageAPIVolley(getApplicationContext()).getImageOrchestrion();
                 /*LiveData<List<LogList>> p = LogsDB.getAllLogs();
                 List<LogList> d = p.getValue();*/
                 //List<Orchestrion> p = LogsDB.getAllOrchestrion();
@@ -100,8 +97,15 @@ public class MainActivity extends AppCompatActivity{
                                 logLists.add(new LogList(getResources().getString(R.string.orchestrions),0,0));
                             }
                             //обновление БД
-                            LogsDB.loadData(getApplication(), logLists);
 
+                            //todo возможно вернуть для progress bar
+                            Thread thread = new Thread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    LogsDB.loadData(getApplication(), logLists);
+                                }
+                            });
+                            thread.start();
                             /*new Thread(new Runnable() {
                                 @Override
                                 public void run() {
@@ -131,7 +135,14 @@ public class MainActivity extends AppCompatActivity{
             patches.add(new Patch(4, getResources().getString(R.string.stormblood), false));
             patches.add(new Patch(3, getResources().getString(R.string.heavensward), false));
             patches.add(new Patch(2, getResources().getString(R.string.reborn), false));
-            LogsDB.addPatch(patches);
+
+            Thread thread = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    LogsDB.addListPatch(patches);
+                }
+            });
+            thread.start();
         }
     }
 

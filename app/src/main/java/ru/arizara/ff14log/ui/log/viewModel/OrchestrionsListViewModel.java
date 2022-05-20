@@ -19,14 +19,15 @@ import ru.arizara.ff14log.repository.OrchestrionRepo;
 import ru.arizara.ff14log.repository.PatchRepo;
 import ru.arizara.ff14log.ui.log.entities.Orchestrion;
 import ru.arizara.ff14log.ui.log.entities.Patch;
+import ru.arizara.ff14log.ui.log.entities.subEntities.OrchestrionWithCategory;
 
 public class OrchestrionsListViewModel extends AndroidViewModel {
 
     private OrchestrionRepo repo;
     private PatchRepo patchRepo;
 
-    private LiveData<List<Orchestrion>> rvOrchestrionOrigin;
-    private MutableLiveData<List<Orchestrion>> rvOrchestrion;
+    private LiveData<List<OrchestrionWithCategory>> rvOrchestrionOrigin;
+    private MutableLiveData<List<OrchestrionWithCategory>> rvOrchestrion;
 
     private LiveData<List<Patch>> patches;
     private MutableLiveData<boolean[]> checkedPatches;
@@ -59,7 +60,7 @@ public class OrchestrionsListViewModel extends AndroidViewModel {
         }
     };*/
 
-    public LiveData<List<Orchestrion>> getDataList() {
+    public LiveData<List<OrchestrionWithCategory>> getDataList() {
         /*if (rvOrchestrion == null) {
             rvOrchestrionOrigin = new MutableLiveData<>();
             rvOrchestrion = new MutableLiveData<>();
@@ -68,7 +69,7 @@ public class OrchestrionsListViewModel extends AndroidViewModel {
         return rvOrchestrion;
     }
 
-    public LiveData<List<Orchestrion>> getDataListOr() {
+    public LiveData<List<OrchestrionWithCategory>> getDataListOr() {
         /*if (rvOrchestrion == null) {
             rvOrchestrionOrigin = new MutableLiveData<>();
             rvOrchestrion = new MutableLiveData<>();
@@ -116,7 +117,7 @@ public class OrchestrionsListViewModel extends AndroidViewModel {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                List<Orchestrion> list = LogsDB.getAllOrchestrion();
+                List<OrchestrionWithCategory> list = LogsDB.getAllOrchestrion();
                 rvOrchestrion.postValue(list);
             }
         }).start();
@@ -135,19 +136,19 @@ public class OrchestrionsListViewModel extends AndroidViewModel {
         }).start();*/
     }
 
-    public void searchItemByName(String textToSearch) {
-        List<Orchestrion> list;
+    public void searchItemByName(String textToSearch, List<String> patchNum) {
+        List<OrchestrionWithCategory> list;
         if (lengNameItem < textToSearch.length()) {
-            list = new ArrayList<>(rvOrchestrion.getValue());
         } else {
-            list = new ArrayList<>(rvOrchestrionOrigin.getValue());
+            searchItemByPatch(patchNum);
         }
+        list = new ArrayList<>(rvOrchestrion.getValue());
 
         lengNameItem = (byte) textToSearch.length();
         if (lengNameItem != 0) {
             textToSearch = textToSearch.toLowerCase(Locale.ROOT);
-            for (Orchestrion item : rvOrchestrionOrigin.getValue()) {
-                String i = item.getName().toLowerCase(Locale.ROOT);
+            for (OrchestrionWithCategory item : rvOrchestrionOrigin.getValue()) {
+                String i = item.getOrchestrion().getName().toLowerCase(Locale.ROOT);
                 if (!i.contains(textToSearch)) {
                     list.remove(item);
                 }
@@ -160,10 +161,10 @@ public class OrchestrionsListViewModel extends AndroidViewModel {
     }
 
     public void searchItemByPatch(List<String> patchNum) {
-        List<Orchestrion> list = new ArrayList<>(rvOrchestrionOrigin.getValue());
+        List<OrchestrionWithCategory> list = new ArrayList<>(rvOrchestrionOrigin.getValue());
 
-        l1:for (Orchestrion item : rvOrchestrionOrigin.getValue()) {
-            String i = item.getPatch();
+        l1:for (OrchestrionWithCategory item : rvOrchestrionOrigin.getValue()) {
+            String i = item.getOrchestrion().getPatch();
             l2:for (String patch : patchNum) {
                 if (i.contains(patch)) {
                     continue l1;

@@ -23,6 +23,8 @@ public class LogList {
     /** клочество объектов лога*/
     private int count;
 
+    private String icon;
+
     public LogList(int id, String name, int current, int count) {
         this.id = id;
         this.name = name;
@@ -51,6 +53,22 @@ public class LogList {
 
     public int getCount() {
         return count;
+    }
+
+    public String getIcon() {
+        return icon;
+    }
+
+    public void updateCurrent(int inc) {
+        this.current += inc;
+    }
+
+    public void setCount(int count) {
+        this.count = count;
+    }
+
+    public void setIcon(String icon) {
+        this.icon = icon;
     }
 
     @Override

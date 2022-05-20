@@ -1,6 +1,8 @@
 package ru.arizara.ff14log.ui.log.fragments;
 
 import android.app.Dialog;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 
 import androidx.appcompat.widget.Toolbar;
@@ -13,8 +15,13 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+
 import ru.arizara.ff14log.R;
 import ru.arizara.ff14log.ui.log.entities.Orchestrion;
+import ru.arizara.ff14log.ui.log.entities.subEntities.OrchestrionWithCategory;
+
 /**
  * Диалог описания мелодии
  */
@@ -28,9 +35,9 @@ public class DescriptionDialog extends DialogFragment {
     private TextView tv_description;
     private ImageView img_category;
 
-    private Orchestrion orchestrion;
+    private OrchestrionWithCategory orchestrion;
 
-    public static DescriptionDialog display(FragmentManager fragmentManager, Orchestrion orchestrion) {
+    public static DescriptionDialog display(FragmentManager fragmentManager, OrchestrionWithCategory orchestrion) {
         DescriptionDialog descriptionDialog = new DescriptionDialog();
         descriptionDialog.setOrchestrion(orchestrion);
         descriptionDialog.show(fragmentManager, TAG);
@@ -38,7 +45,7 @@ public class DescriptionDialog extends DialogFragment {
         return descriptionDialog;
     }
 
-    public void setOrchestrion(Orchestrion orchestrion) {
+    public void setOrchestrion(OrchestrionWithCategory orchestrion) {
         this.orchestrion = orchestrion;
     }
 
@@ -65,12 +72,23 @@ public class DescriptionDialog extends DialogFragment {
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        tv_patch.setText(orchestrion.getPatch());
-        tv_category.setText(orchestrion.getCategory().getName());
-        tv_description.setText(orchestrion.getDescription());
+        tv_patch.setText(orchestrion.getOrchestrion().getPatch());
+        tv_description.setText(orchestrion.getOrchestrion().getDescription());
+        tv_category.setText(orchestrion.getCategoryLog().get(0).getName());
+
+        Bitmap bitmap = null;
+        try {
+            FileInputStream fileInputStream = getActivity().openFileInput(orchestrion.getCategoryLog().get(0).getIcon());
+            bitmap = BitmapFactory.decodeStream(fileInputStream);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        if(bitmap!=null) {
+            img_category.setImageBitmap(bitmap);
+        }
 
         toolbar.setNavigationOnClickListener(v -> dismiss());
-        toolbar.setTitle(orchestrion.getName());
+        toolbar.setTitle(orchestrion.getOrchestrion().getName());
         toolbar.setOnMenuItemClickListener(item -> {
             dismiss();
             return true;

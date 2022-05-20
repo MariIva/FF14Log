@@ -1,6 +1,7 @@
 package ru.arizara.ff14log.ui.log.entities.subEntities;
 
 import androidx.room.Entity;
+import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
 /**
@@ -15,11 +16,13 @@ public class CategoryLog {
 
 	/** Название категории*/
 	private String name;
-	
-	public CategoryLog(int id, String name) {
-		super();
+
+	private String icon;
+
+	public CategoryLog(int id, String name, String icon) {
 		this.id = id;
 		this.name = name;
+		this.icon = icon;
 	}
 
 	public int getId() {
@@ -28,5 +31,9 @@ public class CategoryLog {
 
 	public String getName() {
 		return name;
+	}
+
+	public String getIcon() {
+		return icon;
 	}
 }

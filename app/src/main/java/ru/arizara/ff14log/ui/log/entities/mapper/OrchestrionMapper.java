@@ -29,7 +29,8 @@ public class OrchestrionMapper {
                     jsonObject.getString("owned"),
                     jsonObject.getString("number"),
                     jsonObject.getString("icon"),*/
-                    CategoryLogMapper.CategoryLogFromJSON(jsonObject.getJSONObject("category"))
+                    CategoryLogMapper.CategoryLogFromJSON(jsonObject.getJSONObject("category")),
+                    jsonObject.getString("icon")
             );
         } catch (JSONException e) {
             e.printStackTrace();

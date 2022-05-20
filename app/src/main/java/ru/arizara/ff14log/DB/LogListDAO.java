@@ -30,4 +30,7 @@ public interface LogListDAO {
 
     @Query("SELECT * FROM LogList")
     List<LogList> getAllAsList();
+
+    @Query("SELECT * FROM LogList WHERE name = :name")
+    LogList getByName(String name);
 }

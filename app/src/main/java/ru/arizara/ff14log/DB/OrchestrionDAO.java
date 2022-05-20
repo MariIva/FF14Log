@@ -12,6 +12,8 @@ import java.util.List;
 
 import ru.arizara.ff14log.ui.log.entities.LogList;
 import ru.arizara.ff14log.ui.log.entities.Orchestrion;
+import ru.arizara.ff14log.ui.log.entities.subEntities.OrchestrionWithCategory;
+
 /**
  * Список запросов к таблице мелодий
  */
@@ -30,8 +32,14 @@ public interface  OrchestrionDAO {
      * Запрос для синхронизации с LiveData
      */
     @Query("SELECT * FROM Orchestrion")
-    LiveData<List<Orchestrion>> getAll();
+   /* @Query("SELECT Orchestrion.ID, Orchestrion.NAME, Orchestrion.DESCRIPTION, Orchestrion.PATCH, " +
+            " Orchestrion.categoryID, CategoryLog.NAME, Orchestrion.`check`" +
+            "FROM Orchestrion JOIN CategoryLog ON Orchestrion.categoryID = CategoryLog.ID ")*/
+    /*@Query("SELECT Orchestrion.*, CategoryLog.*" +
+            "FROM Orchestrion JOIN CategoryLog ON Orchestrion.categoryID = CategoryLog.ID ")*/
+    LiveData<List<OrchestrionWithCategory>> getAll();
+
     @Query("SELECT * FROM Orchestrion")
-    List<Orchestrion> getAllList();
+    List<OrchestrionWithCategory> getAllList();
 
 }

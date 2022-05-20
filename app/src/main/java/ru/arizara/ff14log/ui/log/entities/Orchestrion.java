@@ -1,5 +1,6 @@
 package ru.arizara.ff14log.ui.log.entities;
 
+import androidx.room.Embedded;
 import androidx.room.Entity;
 import androidx.room.ForeignKey;
 import androidx.room.Ignore;
@@ -24,9 +25,7 @@ public class Orchestrion {
 	private String description;
 	/** Патч добавления*/
 	private String patch;
-	/** Категория мелодии
-	 * Игнорируется БД
-	 */
+
 	@Ignore
 	private CategoryLog category;
 	/** id категории*/
@@ -34,8 +33,10 @@ public class Orchestrion {
 	/** Метка, получения мелодии*/
 	private boolean check;
 
-	@Ignore
-	public Orchestrion(int id, String name, String description, String patch,
+	private String icon;
+
+	//@Ignore
+	/*public Orchestrion(int id, String name, String description, String patch,
 					   CategoryLog category, boolean check) {
 		this.id = id;
 		this.name = name;
@@ -43,20 +44,23 @@ public class Orchestrion {
 		this.patch = patch;
 		this.category = category;
 		this.check = check;
-	}
+	}*/
 
 
-	public Orchestrion(int id, String name, String description, String patch, int categoryID, boolean check) {
+	public Orchestrion(int id, String name, String description, String patch,
+					   int categoryID, boolean check, String icon) {
 		this.id = id;
 		this.name = name;
 		this.description = description;
 		this.patch = patch;
 		this.categoryID = categoryID;
 		this.check = check;
+		this.icon = icon;
 	}
 
+
 	@Ignore
-	public Orchestrion(int id, String name, String description, String patch, CategoryLog category) {
+	public Orchestrion(int id, String name, String description, String patch, CategoryLog category, String icon) {
 		this.id = id;
 		this.name = name;
 		this.description = description;
@@ -64,7 +68,9 @@ public class Orchestrion {
 		this.category = category;
 		this.categoryID = category.getId();
 		this.check = false;
+		this.icon = icon;
 	}
+
 	public int getId() {
 		return id;
 	}
@@ -85,6 +91,9 @@ public class Orchestrion {
 		return category;
 	}
 
+	public String getIcon() {
+		return icon;
+	}
 	public int getCategoryID() {
 		return categoryID;
 	}
