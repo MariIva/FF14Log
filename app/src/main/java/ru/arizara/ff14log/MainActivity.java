@@ -2,9 +2,12 @@ package ru.arizara.ff14log;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 
 import com.google.android.material.navigation.NavigationView;
+import com.google.android.material.progressindicator.CircularProgressIndicator;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -22,10 +25,12 @@ import java.util.List;
 import ru.arizara.ff14log.DB.LogsDB;
 import ru.arizara.ff14log.databinding.ActivityMainBinding;
 import ru.arizara.ff14log.ui.log.entities.LogList;
+import ru.arizara.ff14log.ui.log.entities.Orchestrion;
 import ru.arizara.ff14log.ui.log.entities.Patch;
+import ru.arizara.ff14log.ui.log.entities.subEntities.OrchestrionWithCategory;
 import ru.arizara.ff14log.ui.log.rest.ImageAPIVolley;
 
-public class MainActivity extends AppCompatActivity{
+public class MainActivity extends AppCompatActivity {
 
     private AppBarConfiguration mAppBarConfiguration;
     private ActivityMainBinding binding;
@@ -33,6 +38,7 @@ public class MainActivity extends AppCompatActivity{
     private SharedPreferences prefs = null;
     private boolean settingFlag = false;
 
+    CircularProgressIndicator pi_t;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,18 +50,21 @@ public class MainActivity extends AppCompatActivity{
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
+        pi_t = (CircularProgressIndicator) findViewById(R.id.pi_t);
+
         prefs = androidx.preference.PreferenceManager.getDefaultSharedPreferences(this);
 
         new Thread(new Runnable() {
             @Override
             public void run() {
                 //new ImageAPIVolley(getApplicationContext()).getImageOrchestrion();
-                /*LiveData<List<LogList>> p = LogsDB.getAllLogs();
+/*LiveData<List<LogList>> p = LogsDB.getAllLogs();
                 List<LogList> d = p.getValue();*/
-                //List<Orchestrion> p = LogsDB.getAllOrchestrion();
+
+                //List<OrchestrionWithCategory> p = LogsDB.getAllOrchestrion();
                 //LogsDB.addLogs(new LogList(getResources().getString(R.string.orchestrions),0,0));
                 //patches = LogsDB.getAllLogsg();
-                //patches = LogsDB.getAllLogsg();
+                //List<Patch> patches = LogsDB.getByCheck();
             }
         }).start();
 
@@ -74,13 +83,13 @@ public class MainActivity extends AppCompatActivity{
         navController.addOnDestinationChangedListener(new NavController.OnDestinationChangedListener() {
             @Override
             public void onDestinationChanged(@NonNull NavController controller, @NonNull NavDestination destination, @Nullable Bundle arguments) {
-                Log.e("onDestinationChanged",destination.getLabel().toString() );
-                switch (destination.getLabel().toString()){
+                Log.e("onDestinationChanged", destination.getLabel().toString());
+                switch (destination.getLabel().toString()) {
                     case "Setting":
                         settingFlag = true;
                         break;
                     case "Logs":
-                        if(settingFlag){
+                        if (settingFlag) {
                             settingFlag = false;
 
 /*
@@ -94,26 +103,19 @@ public class MainActivity extends AppCompatActivity{
                             // включение логов
                             List<LogList> logLists = new ArrayList<>();
                             if (prefs.getBoolean("orch", false)) {
-                                logLists.add(new LogList(getResources().getString(R.string.orchestrions),0,0));
+                                logLists.add(new LogList(getResources().getString(R.string.orchestrions), 0, 0));
                             }
                             //обновление БД
 
                             //todo возможно вернуть для progress bar
-                            Thread thread = new Thread(new Runnable() {
+                            new Thread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    LogsDB.loadData(getApplication(), logLists);
-                                }
-                            });
-                            thread.start();
-
-                            /*new Thread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    LogsDB.addLogs(new LogList(getResources().getString(R.string.orchestrions),0,0));
+                                    handler.sendEmptyMessage(1);
+                                    LogsDB.loadData(getApplication(), handler, logLists);
 
                                 }
-                            }).start();*/
+                            }).start();
                         }
                         break;
                 }
@@ -122,6 +124,25 @@ public class MainActivity extends AppCompatActivity{
         });
 
     }
+
+    // объект для обновления активности
+    public Handler handler = new Handler() {   // создание хэндлера
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            if (msg.what == -1) {
+                pi_t.setVisibility(CircularProgressIndicator.INVISIBLE);
+                prefs.edit().putBoolean("orch", true).apply();
+            }
+            if (msg.what == 0) {
+                pi_t.setVisibility(CircularProgressIndicator.INVISIBLE);
+                prefs.edit().putBoolean("orch", false).apply();
+            }
+            if (msg.what == 1) {
+                pi_t.setVisibility(CircularProgressIndicator.VISIBLE);
+            }
+        }
+    };
 
     @Override
     protected void onResume() {
@@ -153,5 +174,4 @@ public class MainActivity extends AppCompatActivity{
         return NavigationUI.navigateUp(navController, mAppBarConfiguration)
                 || super.onSupportNavigateUp();
     }
-
 }

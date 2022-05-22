@@ -2,6 +2,7 @@ package ru.arizara.ff14log.DB;
 
 import android.app.Application;
 import android.content.Context;
+import android.os.Handler;
 import android.util.Log;
 
 import androidx.lifecycle.LiveData;
@@ -35,7 +36,7 @@ public class LogsDB {
      */
     public LogsDB(Context context) {
         if(database==null) {
-            database = Room.databaseBuilder(context, AppDB.class, "database").build();
+            database = Room.databaseBuilder(context, AppDB.class, "database1").build();
         }
     }
 
@@ -84,10 +85,10 @@ public class LogsDB {
         database.logListDAO().updateLogList(logList);
     }
 
-   /*
+
     public static List<Patch> getByCheck(){
         return database.patchDAO().getByCheck(true);
-    }*/
+    }
 
     /**
      * Добавление в БД списка патчей
@@ -137,7 +138,7 @@ public class LogsDB {
      * @param application - объект приложения для доспута к ресурсам
      * @param logLists - список логов, добавляемых в БД
      */
-    public static void loadData(Application application, List<LogList> logLists) {
+    public static void loadData(Application application, Handler handler, List<LogList> logLists) {
         List<LogList> logBD = getAllAsList();
         for (LogList logList : logLists) {
             if (!logBD.contains(logList)) {
@@ -148,7 +149,7 @@ public class LogsDB {
                     try {// todo отсутвие дооступа к серверу
                         new OrchestrionAPIVolley(
                                 application.getApplicationContext())
-                                .getAllOrchestrion(orchestrionList);
+                                .getAllOrchestrion(handler,orchestrionList);
                         while (orchestrionList.size() == 0) {
                             Thread.sleep(100);
                         }
@@ -173,8 +174,9 @@ public class LogsDB {
                     }
                     logList.setCount(orchestrionList.size());
                     logList.setIcon(orchestrionList.get(0).getIcon());
-                    addLogs(logList);
                     addListOrchestrion(orchestrionList);
+                    addLogs(logList);
+                    handler.sendEmptyMessage(-1);
                 }
             }
         }

@@ -1,7 +1,10 @@
 package ru.arizara.ff14log.ui.log.rest;
 
+import android.app.Application;
 import android.content.Context;
+import android.os.Handler;
 import android.util.Log;
+import android.widget.Toast;
 
 import androidx.lifecycle.MutableLiveData;
 
@@ -11,6 +14,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.Volley;
+import com.google.android.material.snackbar.Snackbar;
 
 import org.json.JSONArray;
 
@@ -60,7 +64,7 @@ public class OrchestrionAPIVolley implements OrchestrionAPI{
     }
 
     @Override
-    public void getAllOrchestrion(List<Orchestrion> list) {
+    public void getAllOrchestrion(Handler handler, List<Orchestrion> list){
         RequestQueue requestQueue = Volley.newRequestQueue(context);
         JsonArrayRequest request = new JsonArrayRequest(
                 Request.Method.GET,
@@ -77,12 +81,20 @@ public class OrchestrionAPIVolley implements OrchestrionAPI{
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         Log.e("onErrorResponse",error.toString());
+                        /*Snackbar.make(,
+                                "R.string.text_label",
+                                Snackbar.LENGTH_LONG)
+                                .show();*/
+                        Toast.makeText(context,
+                                "context.getString(R.string.error_network_timeout)",
+                                Toast.LENGTH_LONG).show();
+                        handler.sendEmptyMessage(0);
+
                     }
                 }
         );
         requestQueue.add(request);
     }
-
     @Override
     public void getOrchestrionByPatch(MutableLiveData<List<Orchestrion>> list) {
 
