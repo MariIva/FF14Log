@@ -9,6 +9,7 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.ExecutorService;
@@ -34,13 +35,21 @@ public class OrchestrionsListViewModel extends AndroidViewModel {
 
 
     private byte lengNameItem = 0;
+    private String nameItem = "";
+    private byte choose = 0;
+    private List<Patch> patchNum;
 
     public OrchestrionsListViewModel(@NonNull Application application) {
         super(application);
         repo = new OrchestrionRepo(application);
         patchRepo = new PatchRepo(application);
-        rvOrchestrionOrigin = repo.getAll();
+
         patches = patchRepo.getAll();
+        rvOrchestrionOrigin = repo.getAll();
+
+
+        rvOrchestrion = new MutableLiveData<>();
+        //rvOrchestrionOrigin = new MutableLiveData<>();
         loadData();
         /*List<Orchestrion> list = rvOrchestrionOrigin.getValue();
         if (list==null){
@@ -82,7 +91,7 @@ public class OrchestrionsListViewModel extends AndroidViewModel {
         // todo get data from base
 
         /*patches = new MutableLiveData<>();
-        *//*patches.setValue(new String[]{
+         *//*patches.setValue(new String[]{
                 "endwalker",
                 "shadowbringers",
                 "stormblood",
@@ -113,12 +122,12 @@ public class OrchestrionsListViewModel extends AndroidViewModel {
 
     private void loadData() {
         //todo get data from base
-        rvOrchestrion = new MutableLiveData<>();
         new Thread(new Runnable() {
             @Override
             public void run() {
                 List<OrchestrionWithCategory> list = LogsDB.getAllOrchestrion();
                 rvOrchestrion.postValue(list);
+                // rvOrchestrionOrigin.postValue(new ArrayList<>(list));
             }
         }).start();
        /* new OrchestrionAPIVolley(
@@ -136,15 +145,18 @@ public class OrchestrionsListViewModel extends AndroidViewModel {
         }).start();*/
     }
 
-    public void searchItemByName(String textToSearch, List<String> patchNum) {
+    public void searchItemByName(String textToSearch/*, List<Patch> patchNum*/) {
         List<OrchestrionWithCategory> list;
         if (lengNameItem < textToSearch.length()) {
         } else {
-            searchItemByPatch(patchNum);
+            if (this.patchNum == null) this.patchNum=new ArrayList<>(patches.getValue());
+            searchItemByCheck2(new ArrayList<>(rvOrchestrionOrigin.getValue()));
+            searchItemByPatch2(new ArrayList<>(rvOrchestrion.getValue()));
         }
         list = new ArrayList<>(rvOrchestrion.getValue());
 
         lengNameItem = (byte) textToSearch.length();
+        nameItem = textToSearch.toLowerCase(Locale.ROOT);
         if (lengNameItem != 0) {
             textToSearch = textToSearch.toLowerCase(Locale.ROOT);
             for (OrchestrionWithCategory item : rvOrchestrionOrigin.getValue()) {
@@ -156,29 +168,140 @@ public class OrchestrionsListViewModel extends AndroidViewModel {
         }
 
         rvOrchestrion.setValue(list);
-        Log.e("searchItem", rvOrchestrion.getValue().size() + "");
-        Log.e("searchItem", rvOrchestrionOrigin.getValue().size() + "");
+        Log.e("searchItemByName", rvOrchestrion.getValue().size() + "");
+        Log.e("searchItemByName", rvOrchestrionOrigin.getValue().size() + "");
     }
 
-    public void searchItemByPatch(List<String> patchNum) {
-        List<OrchestrionWithCategory> list = new ArrayList<>(rvOrchestrionOrigin.getValue());
 
-        l1:for (OrchestrionWithCategory item : rvOrchestrionOrigin.getValue()) {
+
+    private void searchItemByName2( List<OrchestrionWithCategory> list) {
+        if (lengNameItem != 0) {
+            //List<OrchestrionWithCategory> list = new ArrayList<>(rvOrchestrionOrigin.getValue());
+            for (OrchestrionWithCategory item : rvOrchestrionOrigin.getValue()) {
+                String i = item.getOrchestrion().getName().toLowerCase(Locale.ROOT);
+                if (!i.contains(nameItem)) {
+                    list.remove(item);
+                }
+            }
+        }
+        rvOrchestrion.setValue(list);
+        Log.e("searchItemByName2", rvOrchestrion.getValue().size() + "");
+        Log.e("searchItemByName2", rvOrchestrionOrigin.getValue().size() + "");
+
+    }
+
+    public void searchItemByPatch(List<Patch> patchNum) {
+
+        searchItemByCheck2(new ArrayList<>(rvOrchestrionOrigin.getValue()));
+        searchItemByName2(new ArrayList<>(rvOrchestrion.getValue()));
+
+        List<OrchestrionWithCategory> list = new ArrayList<>(rvOrchestrion.getValue());
+        this.patchNum = patchNum;
+
+
+        l1:
+        for (OrchestrionWithCategory item : rvOrchestrionOrigin.getValue()) {
             String i = item.getOrchestrion().getPatch();
-            l2:for (String patch : patchNum) {
-                if (i.contains(patch)) {
+            l2:
+            for (Patch patch : patchNum) {
+                if (i.contains(patch.getId() + ".")) {
                     continue l1;
                 }
             }
             list.remove(item);
         }
 
-        Log.e("searchItem", list.size() + "");
-        Log.e("searchItem", rvOrchestrionOrigin.getValue().size() + "");
+        Log.e("searchItemByPatch1", list.size() + "");
+        Log.e("searchItemByPatch1", rvOrchestrionOrigin.getValue().size() + "");
         rvOrchestrion.setValue(list);
     }
 
-    public void checkPatches(int i, boolean b){
+    private void searchItemByPatch2(List<OrchestrionWithCategory> list) {
+        //List<OrchestrionWithCategory> list = new ArrayList<>(rvOrchestrion.getValue());
+
+        l1:
+        for (OrchestrionWithCategory item : rvOrchestrionOrigin.getValue()) {
+            String i = item.getOrchestrion().getPatch();
+            l2:
+            for (Patch patch : patchNum) {
+                if (i.contains(patch.getId() + ".")) {
+                    continue l1;
+                }
+            }
+            list.remove(item);
+        }
+
+        Log.e("searchItemByPatch2", list.size() + "");
+        Log.e("searchItemByPatch2", rvOrchestrionOrigin.getValue().size() + "");
+        rvOrchestrion.setValue(list);
+    }
+
+    public void searchItemByCheck(int choose) {
+        List<OrchestrionWithCategory> list;
+        if (this.choose != (byte) choose) {
+            searchItemByName2(new ArrayList<>(rvOrchestrionOrigin.getValue()));
+            searchItemByPatch2(new ArrayList<>(rvOrchestrion.getValue()));
+        }
+        list = new ArrayList<>(rvOrchestrion.getValue());
+
+        this.choose = (byte) choose;
+        switch (this.choose) {
+            case 0:
+                break;
+            case 1:
+                Iterator<OrchestrionWithCategory> iter1 = list.iterator();
+                while (iter1.hasNext()) {
+                    OrchestrionWithCategory orchestrion = iter1.next();
+                    if (!orchestrion.getOrchestrion().isCheck()) {
+                        iter1.remove();
+                    }
+                }
+                break;
+            case 2:
+                Iterator<OrchestrionWithCategory> iter2 = list.iterator();
+                while (iter2.hasNext()) {
+                    OrchestrionWithCategory orchestrion = iter2.next();
+                    if (orchestrion.getOrchestrion().isCheck()) {
+                        iter2.remove();
+                    }
+                }
+                break;
+        }
+        Log.e("searchItemByCheck", list.size() + "");
+        Log.e("searchItemByCheck", rvOrchestrionOrigin.getValue().size() + "");
+        rvOrchestrion.setValue(list);
+    }
+
+    private void searchItemByCheck2( List<OrchestrionWithCategory> list) {
+        //List<OrchestrionWithCategory> list = new ArrayList<>(rvOrchestrionOrigin.getValue());
+        switch (this.choose) {
+            case 0:
+                break;
+            case 1:
+                Iterator<OrchestrionWithCategory> iter1 = list.iterator();
+                while (iter1.hasNext()) {
+                    OrchestrionWithCategory orchestrion = iter1.next();
+                    if (!orchestrion.getOrchestrion().isCheck()) {
+                        iter1.remove();
+                    }
+                }
+                break;
+            case 2:
+                Iterator<OrchestrionWithCategory> iter2 = list.iterator();
+                while (iter2.hasNext()) {
+                    OrchestrionWithCategory orchestrion = iter2.next();
+                    if (orchestrion.getOrchestrion().isCheck()) {
+                        iter2.remove();
+                    }
+                }
+                break;
+        }
+        Log.e("searchItemByCheck2", list.size() + "");
+        Log.e("searchItemByCheck2", rvOrchestrionOrigin.getValue().size() + "");
+        rvOrchestrion.setValue(list);
+    }
+
+    public void checkPatches(int i, boolean b) {
         checkedPatches.getValue()[i] = b;
         checkedPatches.setValue(checkedPatches.getValue());
     }

@@ -1,6 +1,7 @@
 package ru.arizara.ff14log.ui.log.fragments;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.PopupMenu;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
@@ -15,9 +16,14 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 
@@ -26,7 +32,6 @@ import com.google.android.material.textfield.TextInputLayout;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import ru.arizara.ff14log.R;
@@ -39,7 +44,6 @@ import ru.arizara.ff14log.ui.log.adapters.OrchestrionsAdapter;
 import ru.arizara.ff14log.ui.log.entities.Patch;
 import ru.arizara.ff14log.ui.log.entities.subEntities.OrchestrionWithCategory;
 import ru.arizara.ff14log.ui.log.viewModel.OrchestrionsListViewModel;
-import ru.arizara.ff14log.ui.log.entities.Orchestrion;
 
 /**
  * Фрагмент для списка мелодий
@@ -57,9 +61,11 @@ public class OrchestrionsListFragment extends Fragment {
     private OrchestrionsAdapter adapter;
 
     private EditText editText;
-    private ImageButton button;
+    private Button button;
 
-    private List<String> patchNum;
+    private TextInputLayout menu;
+
+    private List<Patch> patchNum;
 
     public static OrchestrionsListFragment newInstance() {
         return new OrchestrionsListFragment();
@@ -81,7 +87,9 @@ public class OrchestrionsListFragment extends Fragment {
 
         recyclerView = (RecyclerView) root.findViewById(R.id.rv_orchestrions);
         editText = ((TextInputLayout) root.findViewById(R.id.tl_find)).getEditText();
-        button = (ImageButton) root.findViewById(R.id.imgbtn_filter);
+        button = (Button) root.findViewById(R.id.btn_filter);
+        menu = (TextInputLayout)  root.findViewById(R.id.menu);
+
 
         initRecyclerView();
 
@@ -104,8 +112,7 @@ public class OrchestrionsListFragment extends Fragment {
                 for (int i = 0; i < list.size(); i++) {
                     patches[list.size()-i-1] = list.get(i).getName();
                 }
-
-                patchNum = new ArrayList<>(Arrays.asList(patches));
+                patchNum = list;
             }
         });
         mViewModel.getDataCheckedPatches().observe(getViewLifecycleOwner(), new Observer<boolean[]>() {
@@ -132,10 +139,11 @@ public class OrchestrionsListFragment extends Fragment {
                         .setPositiveButton(getResources().getString(R.string.accept), new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
-                                patchNum = new ArrayList<>();
+                                //List<Patch> num = new ArrayList<>();
+                                patchNum.clear();
                                 for (int i1 = 0; i1 < checkedPatches.length; i1++) {
                                     if(checkedPatches[i1]){
-                                        patchNum.add(checkedPatches.length-i1+1+".");
+                                        patchNum.add(new Patch(checkedPatches.length-i1+1, patches[i1], checkedPatches[i1]));
                                     }
                                 }
                                 mViewModel.searchItemByPatch(patchNum);
@@ -157,14 +165,21 @@ public class OrchestrionsListFragment extends Fragment {
             }
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                mViewModel.searchItemByName(s.toString(), patchNum);
-                adapter.notifyDataSetChanged();
+                mViewModel.searchItemByName(s.toString());
             }
             @Override
             public void afterTextChanged(Editable s) {
             }
 
         });
+
+        menu.getEditText().setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showPopupMenu(v);
+            }
+        });
+
 
         return root;
     }
@@ -176,6 +191,34 @@ public class OrchestrionsListFragment extends Fragment {
         adapter = new OrchestrionsAdapter(getContext(), orchestrionList);
         // устанавливаем для списка адаптер
         recyclerView.setAdapter(adapter);
+    }
+
+    private void showPopupMenu(View v) {
+        PopupMenu popupMenu = new PopupMenu(getContext(), v);
+        popupMenu.inflate(R.menu.menu_sort);
+
+        popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem item) {
+                        switch (item.getItemId()) {
+                            case R.id.menu_all:
+                                menu.setHint(getResources().getString(R.string.all));
+                                mViewModel.searchItemByCheck(0);
+                                return true;
+                            case R.id.menu_check:
+                                menu.setHint(getResources().getString(R.string.check));
+                                mViewModel.searchItemByCheck(1);
+                                return true;
+                            case R.id.menu_no_check:
+                                menu.setHint(getResources().getString(R.string.no_check));
+                                mViewModel.searchItemByCheck(2);
+                                return true;
+                            default:
+                                return false;
+                        }
+                    }
+                });
+        popupMenu.show();
     }
 
 

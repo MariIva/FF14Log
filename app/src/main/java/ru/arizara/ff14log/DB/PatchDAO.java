@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
 import androidx.room.Insert;
 import androidx.room.Query;
+import androidx.room.Update;
 
 import java.util.List;
 
@@ -16,6 +17,9 @@ public interface PatchDAO {
 
     @Insert
     void insertPatch(Patch patch);
+
+    @Update
+    void updatePatch(Patch patch);
 
     @Query("SELECT * FROM Patch")
     LiveData<List<Patch>> getAll();

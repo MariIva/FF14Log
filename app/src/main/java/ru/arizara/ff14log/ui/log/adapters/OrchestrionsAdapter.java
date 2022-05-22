@@ -35,6 +35,7 @@ public class OrchestrionsAdapter extends RecyclerView.Adapter<OrchestrionsAdapte
     private LogList log;
     private Context context;
     private Bitmap bitmap;
+    public static boolean update = true;
 
     /**
      *
@@ -67,38 +68,49 @@ public class OrchestrionsAdapter extends RecyclerView.Adapter<OrchestrionsAdapte
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         OrchestrionWithCategory orchestrion = list.get(position);
-        if (bitmap==null){
             try {
                 FileInputStream fileInputStream = context.openFileInput(orchestrion.getOrchestrion().getIcon());
                 bitmap = BitmapFactory.decodeStream(fileInputStream);
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             }
+
+
+        try {
+            Bitmap bitmapCat;
+            FileInputStream fileInputStream = context.openFileInput(orchestrion.getCategoryLog().get(0).getIcon());
+            bitmapCat = BitmapFactory.decodeStream(fileInputStream);
+            holder.imgLocation.setImageBitmap(bitmapCat);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
         }
-        //todo
         holder.tvName.setText(orchestrion.getOrchestrion().getName());
         holder.twCheck.setChecked(orchestrion.getOrchestrion().isCheck());
         holder.imgOrc.setImageBitmap(bitmap);
 
-        holder.twCheck.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+
+        holder.twCheck.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                orchestrion.getOrchestrion().setCheck(isChecked);
-                if(isChecked){
-                    log.updateCurrent(1);
-                }else {
-                    log.updateCurrent(-1);
-                }
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        LogsDB.updateOrchestrion(orchestrion.getOrchestrion());
-                        LogsDB.updateLog(log);
+            public void onClick(View v) {
+                boolean isChecked = holder.twCheck.isChecked();
+                holder.twCheck.setChecked(isChecked);
+                if (isChecked != orchestrion.getOrchestrion().isCheck()) {
+                    orchestrion.getOrchestrion().setCheck(isChecked);
+                    if (isChecked) {
+                        log.updateCurrent(1);
+                    } else {
+                        log.updateCurrent(-1);
                     }
-                }).start();
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            LogsDB.updateOrchestrion(orchestrion.getOrchestrion());
+                            LogsDB.updateLog(log);
+                        }
+                    }).start();
+                }
             }
         });
-
 
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override

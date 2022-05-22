@@ -44,16 +44,12 @@ public class OrchestrionRepo {
    /* public List<Orchestrion> getAllList() {
         return orchestrionDAO.getAllList();
     }*/
-    /**
-     *
-     */
-    public void update (Orchestrion orchestrion) {
+
+    /*public void update (Orchestrion orchestrion) {
         new OrchestrionRepo.updateAsyncTask(orchestrionDAO).execute(orchestrion);
     }
 
-    /**
-     *
-     */
+
     private static class updateAsyncTask extends AsyncTask<Orchestrion, Void, Void> {
 
         private OrchestrionDAO mAsyncTaskDao;
@@ -67,5 +63,5 @@ public class OrchestrionRepo {
             mAsyncTaskDao.updateOrchestrion(params[0]);
             return null;
         }
-    }
+    }*/
 }

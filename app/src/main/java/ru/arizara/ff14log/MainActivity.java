@@ -106,6 +106,7 @@ public class MainActivity extends AppCompatActivity{
                                 }
                             });
                             thread.start();
+
                             /*new Thread(new Runnable() {
                                 @Override
                                 public void run() {
@@ -130,11 +131,11 @@ public class MainActivity extends AppCompatActivity{
             prefs.edit().putBoolean("firstrun", false).apply();
             //todo создание БД
             List<Patch> patches = new ArrayList<>();
-            patches.add(new Patch(6, getResources().getString(R.string.endwalker), false));
-            patches.add(new Patch(5, getResources().getString(R.string.shadowbringers), false));
-            patches.add(new Patch(4, getResources().getString(R.string.stormblood), false));
-            patches.add(new Patch(3, getResources().getString(R.string.heavensward), false));
-            patches.add(new Patch(2, getResources().getString(R.string.reborn), false));
+            patches.add(new Patch(6, getResources().getString(R.string.endwalker), true));
+            patches.add(new Patch(5, getResources().getString(R.string.shadowbringers), true));
+            patches.add(new Patch(4, getResources().getString(R.string.stormblood), true));
+            patches.add(new Patch(3, getResources().getString(R.string.heavensward), true));
+            patches.add(new Patch(2, getResources().getString(R.string.reborn), true));
 
             Thread thread = new Thread(new Runnable() {
                 @Override
