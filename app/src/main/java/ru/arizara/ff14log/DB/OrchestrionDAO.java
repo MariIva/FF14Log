@@ -32,11 +32,6 @@ public interface  OrchestrionDAO {
      * Запрос для синхронизации с LiveData
      */
     @Query("SELECT * FROM Orchestrion")
-   /* @Query("SELECT Orchestrion.ID, Orchestrion.NAME, Orchestrion.DESCRIPTION, Orchestrion.PATCH, " +
-            " Orchestrion.categoryID, CategoryLog.NAME, Orchestrion.`check`" +
-            "FROM Orchestrion JOIN CategoryLog ON Orchestrion.categoryID = CategoryLog.ID ")*/
-    /*@Query("SELECT Orchestrion.*, CategoryLog.*" +
-            "FROM Orchestrion JOIN CategoryLog ON Orchestrion.categoryID = CategoryLog.ID ")*/
     LiveData<List<OrchestrionWithCategory>> getAll();
 
     @Query("SELECT * FROM Orchestrion")

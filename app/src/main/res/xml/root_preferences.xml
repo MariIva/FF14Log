@@ -10,7 +10,7 @@
             app:title="@string/orchestrions" />
     </PreferenceCategory>
 
-    <PreferenceCategory app:title="@string/sync_header">
+    <!--<PreferenceCategory app:title="@string/sync_header">
 
         <SwitchPreferenceCompat
             android:id="@+id/sw_endwalker"
@@ -41,6 +41,6 @@
             app:key="reborn"
             app:title="@string/reborn" />
 
-    </PreferenceCategory>
+    </PreferenceCategory>-->
 
 </PreferenceScreen>

@@ -46,19 +46,18 @@ public class SetFragment extends Fragment {
     }
 
 
-    public static class SettingFragment extends PreferenceFragmentCompat
-            /*implements SharedPreferences.OnSharedPreferenceChangeListener*/ {
-        SwitchPreferenceCompat switchPreference1;
+    public static class SettingFragment extends PreferenceFragmentCompat {
+        /*SwitchPreferenceCompat switchPreference1;
         SwitchPreferenceCompat switchPreference2;
         SwitchPreferenceCompat switchPreference3;
         SwitchPreferenceCompat switchPreference4;
-        SwitchPreferenceCompat switchPreference5;
+        SwitchPreferenceCompat switchPreference5;*/
 
         @Override
         public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
             setPreferencesFromResource(R.xml.root_preferences, rootKey);
             final SharedPreferences preferences = androidx.preference.PreferenceManager.getDefaultSharedPreferences(getActivity());
-            switchPreference1 = (SwitchPreferenceCompat) findPreference("endwalker");
+           /* switchPreference1 = (SwitchPreferenceCompat) findPreference("endwalker");
             switchPreference2 = (SwitchPreferenceCompat) findPreference("shadowbringers");
             switchPreference3 = (SwitchPreferenceCompat) findPreference("stormblood");
             switchPreference4 = (SwitchPreferenceCompat) findPreference("heavensward");
@@ -117,7 +116,7 @@ public class SetFragment extends Fragment {
                         }
                     }
                 }
-            });
+            });*/
         }
 
 

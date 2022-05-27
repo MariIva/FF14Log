@@ -36,6 +36,8 @@
     <string name="all">All</string>
     <string name="check">Check</string>
     <string name="no_check">No check</string>
+    <string name="final_fantasy_xiv_logs">FINAL FANTASY XIV Logs</string>
+    <string name="collection_of_game_items">Collection of game items</string>
 
     <!-- Messages Preferences -->
     <!-- <string name="signature_title">Your signature</string>

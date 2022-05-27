@@ -239,6 +239,7 @@ public class OrchestrionsListViewModel extends AndroidViewModel {
     public void searchItemByCheck(int choose) {
         List<OrchestrionWithCategory> list;
         if (this.choose != (byte) choose) {
+            if (this.patchNum == null) this.patchNum=new ArrayList<>(patches.getValue());
             searchItemByName2(new ArrayList<>(rvOrchestrionOrigin.getValue()));
             searchItemByPatch2(new ArrayList<>(rvOrchestrion.getValue()));
         }

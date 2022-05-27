@@ -14,7 +14,7 @@ public class Patch {
     private int id;
     /** Глобальное название патча*/
     private String name;
-    /** Метка, загружен патч*/
+    /** Метка*/
     private boolean check;
 
     public Patch() {
